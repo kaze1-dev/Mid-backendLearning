@@ -6,7 +6,7 @@ const verifyJWT = async (req, res, next) => {
    try {
      
       const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.split("")[1];
+      const token = authHeader && authHeader.split(" ")[1];
 
       if(!token) {
          return res.status(401).json({message: `No token, authorization denied`})
@@ -14,7 +14,7 @@ const verifyJWT = async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-      const user = await findById(decoded.id).select("-password");
+      const user = await User.findById(decoded.id).select("-password");
 
       if(!user) {
          return res.status(404).json({message: `User not found`})
@@ -25,7 +25,7 @@ const verifyJWT = async (req, res, next) => {
 
    } catch (error) {
       console.log("auth middleware error:", error.message);
-      return res.status(403).json({message: `Token is not valid`})
+      return res.status(401).json({message: `Token is not valid`})
    }
 
 }
